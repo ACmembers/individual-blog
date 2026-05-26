@@ -64,7 +64,7 @@ function handleCellClick(cell: CalendarGridCell) {
 				{cell.day}
 				{#if cell.hasPost && !cell.isSelected}
 					<span
-						class="absolute bottom-1 w-1 h-1 rounded-full bg-[var(--primary)]"
+						class="absolute bottom-1 w-1.5 h-1.5 rounded-full bg-[var(--primary)]"
 					></span>
 				{/if}
 				{#if cell.hasPost && cell.postCount > 1}
