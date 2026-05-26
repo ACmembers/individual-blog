@@ -14,5 +14,20 @@ export const profileConfig: ProfileConfig = {
 			icon: "fa7-brands:github",
 			url: "https://github.com/ACmembers",
 		},
+		{
+			name: "Bilibili",
+			icon: "fa7-brands:bilibili",
+			url: "https://space.bilibili.com/1147662816",
+		},
+		{
+			name: "Gitee",
+			icon: "simple-icons:gitee",
+			url: "https://gitee.com/acmember",
+		},
+		{
+			name: "AtCoder",
+			icon: "material-symbols:code",
+			url: "https://atcoder.jp/users/ACmember",
+		},
 	],
 };
