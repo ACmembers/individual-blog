@@ -15,7 +15,7 @@ import {
 import { ReadingTime, WordCount } from "@components/features/posts/atoms";
 import License from "@components/misc/License.astro";
 import Markdown from "@components/misc/Markdown.astro";
-import MainGridLayout from "@layouts/MainGridLayout.astro";
+import PostLayout from "@layouts/PostLayout.astro";
 import { getRelatedPosts, getSortedPosts } from "@utils/content-utils";
 import { hasCustomPermalink, initPostIdMap } from "@utils/permalink-utils";
 import { getPostPublicDescription } from "@utils/post-card-content";
@@ -205,15 +205,15 @@ const jsonLd = {
 };
 ---
 
-<MainGridLayout
-	banner={entry.data.image}
+<PostLayout
+	
 	title={entry.data.title}
 	description={publicDescription}
 	lang={entry.data.lang}
-	setOGTypeArticle={true}
-	postSlug={entry.id}
-	headings={headings}
-	coverImage={ogCoverUrl}
+	
+	
+	
+	
 >
 	<script
 		is:inline
@@ -400,4 +400,4 @@ const jsonLd = {
 			</div>
 		)
 	}
-</MainGridLayout>
+</PostLayout>
