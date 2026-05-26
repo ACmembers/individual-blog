@@ -2,6 +2,7 @@
 title: 第一篇博客
 description: 记录这个个人博客的开始。
 pubDate: 2026-05-23
+category: 开发
 tags: [随笔, 博客]
 ---
 
