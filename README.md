@@ -1,100 +1,78 @@
 # 个人博客
 
-这是我的个人博客项目，用来记录技术学习、项目实践、生活想法和一些阶段性的总结。
+基于 [Mizuki](https://github.com/LyraVoid/Mizuki) 主题搭建的个人博客，用于记录技术学习、项目实践和生活想法。
 
-这个 README 主要作为个人使用备忘，方便之后快速回到项目、写文章、启动预览和发布博客。
+托管于 GitHub Pages，通过 GitHub Actions 自动构建部署。
 
 ## 技术栈
 
-- Astro：静态站点生成器
-- Markdown：编写博客文章
-- GitHub Pages：免费托管博客
-- GitHub Actions：自动构建和部署
+- **Mizuki** — Material Design 3 博客主题
+- **Astro 6** — 静态站点生成器
+- **Svelte 5 + Tailwind CSS 4** — 前端交互与样式
+- **pnpm** — 包管理器
+- **GitHub Pages + Actions** — 托管与自动部署
 
 ## 常用命令
 
 ```bash
-# 安装依赖
-npm install --ignore-scripts
-
-# 本地启动
-npm run dev
-
-# 构建生产版本
-npm run build
-
-# 本地预览构建结果
-npm run preview
-
-# 类型检查
-npm run check
+pnpm install          # 安装依赖
+pnpm dev              # 本地启动开发服务器 (localhost:3000)
+pnpm build            # 构建生产版本
+pnpm preview          # 本地预览构建结果
+pnpm check            # 类型检查
 ```
 
-## 写文章流程
+## 写文章
 
-1. 在 `src/content/blog/` 下新建 Markdown 文件。
-2. 在文件开头填写文章信息。
-3. 编写正文内容。
-4. 执行 `npm run dev` 本地预览。
-5. 确认无误后提交并推送到 GitHub。
+文章存放在 `src/content/posts/` 目录下，每篇文章一个文件夹，内含 `index.md`：
 
-文章示例：
+```
+src/content/posts/
+└── hello-world/
+    └── index.md
+```
+
+文章 frontmatter 格式：
 
 ```md
 ---
-title: 第一篇博客
-description: 记录这个个人博客的开始。
-pubDate: 2026-05-23
-tags: [随笔, 博客]
+title: 文章标题
+published: 2026-05-23
+description: 文章摘要。
+tags: [标签1, 标签2]
+category: 分类名
 ---
 
-这是正文内容。
+正文内容。
 ```
 
-## 内容整理
+## 目录结构
 
-```text
-src/content/blog/     # 博客文章，使用 Markdown 编写
-src/pages/            # 页面入口：首页、文章详情页
-src/layouts/          # 页面布局
-src/styles/           # 全局样式
-public/               # 静态资源，例如 favicon、公开图片
-.github/workflows/    # GitHub Pages 自动部署配置
+```
+src/content/posts/        # 博客文章
+src/content/spec/         # 独立页面（关于、友链等）
+src/config/               # 站点配置（标题、头像、导航、社交链接等）
+src/assets/images/        # 头像等资源
+public/assets/            # 壁纸、字体等静态资源
+.github/workflows/        # Actions 自动部署
 ```
 
-## GitHub Pages 发布
+## 关键配置
 
-博客通过 GitHub Actions 自动部署到 GitHub Pages。
+站点核心设置在 `src/config/siteConfig.ts`：
+- 站点标题、副标题、URL
+- 主题色相 (`themeColor.hue`)
+- 壁纸模式 (`wallpaperMode.defaultMode`)
+- 首页 Banner 图片与文字
 
-基本流程：
+个人资料在 `src/config/profileConfig.ts`：
+- 头像、昵称、简介
+- 社交链接（GitHub、Bilibili、Gitee、AtCoder 等）
 
-1. 本地完成文章编写和预览。
-2. 提交并推送到 GitHub 的 main 分支。
-3. GitHub Actions 自动构建并部署。
+导航栏在 `src/config/navBarConfig.ts`。
 
-首次配置：
+## 发布
 
-1. 在 GitHub 仓库设置中开启 Pages，来源选择 GitHub Actions。
-2. 在 `astro.config.mjs` 中将 `site` 和 `base` 替换为实际的 GitHub 用户名和仓库名。
+推送 main 分支后，GitHub Actions 自动构建并部署到 GitHub Pages。
 
-## 发布前检查
-
-发布前可以简单检查：
-
-- 文章标题是否正确
-- 日期、分类、标签是否填写
-- 图片是否能正常显示
-- 内部链接和外部链接是否可访问
-- 本地构建是否成功
-- GitHub Pages 发布配置是否正确
-
-## 个人备忘
-
-- 文章内容优先保持清晰，不追求复杂排版。
-- 图片尽量压缩后再上传。
-- 定期整理旧文章的分类和标签。
-- 有新想法可以先写草稿，不必一次写完。
-
-## 关于
-
-这个博客是我长期记录和整理自己的地方。比起追求复杂功能，更希望它简单、稳定、方便维护。
+首次使用需在仓库 Settings → Pages 中将 Source 设为 GitHub Actions。
