@@ -59,10 +59,24 @@ body {
   font-family: var(--font-body);
   color: var(--color-text);
   background-color: var(--color-bg);
+  background-image: var(--bg-image, none);
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
   line-height: 1.8;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(250, 249, 247, 0.78);
+  backdrop-filter: blur(2px);
+  z-index: -1;
+  pointer-events: none;
 }
 
 img {

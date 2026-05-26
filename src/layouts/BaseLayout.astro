@@ -18,7 +18,7 @@ const { title, description = '个人博客' } = Astro.props;
     <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
     <title>{title}</title>
   </head>
-  <body>
+  <body style={`--bg-image: url('${import.meta.env.BASE_URL}background.jpg')`}>
     <header class="site-header">
       <div class="container">
         <h1 class="site-title"><a href={import.meta.env.BASE_URL}>个人博客</a></h1>
