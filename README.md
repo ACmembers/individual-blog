@@ -6,19 +6,16 @@
 
 ## 技术栈
 
-这个博客计划采用静态博客方案，方便长期维护并托管到 GitHub。
-
-- Markdown：用于编写博客文章
-- 静态站点生成器：用于把文章生成静态页面
-- GitHub Pages：用于免费托管和访问博客
-
-静态博客不依赖数据库和后端服务，更适合个人记录、长期归档和简单发布。
+- Astro：静态站点生成器
+- Markdown：编写博客文章
+- GitHub Pages：免费托管博客
+- GitHub Actions：自动构建和部署
 
 ## 常用命令
 
 ```bash
 # 安装依赖
-npm install
+npm install --ignore-scripts
 
 # 本地启动
 npm run dev
@@ -28,42 +25,57 @@ npm run build
 
 # 本地预览构建结果
 npm run preview
-```
 
-如果项目实际使用的命令不同，以 `package.json` 中的 scripts 为准。
+# 类型检查
+npm run check
+```
 
 ## 写文章流程
 
-1. 在文章目录中新建 Markdown 文件。
-2. 填写文章标题、日期、分类、标签等信息。
+1. 在 `src/content/blog/` 下新建 Markdown 文件。
+2. 在文件开头填写文章信息。
 3. 编写正文内容。
-4. 本地启动博客，检查排版、链接和图片是否正常。
-5. 确认无误后构建并发布。
+4. 执行 `npm run dev` 本地预览。
+5. 确认无误后提交并推送到 GitHub。
+
+文章示例：
+
+```md
+---
+title: 第一篇博客
+description: 记录这个个人博客的开始。
+pubDate: 2026-05-23
+tags: [随笔, 博客]
+---
+
+这是正文内容。
+```
 
 ## 内容整理
 
-建议按用途整理文件：
-
 ```text
-posts/        # 博客文章
-public/       # 静态资源
-assets/       # 图片、样式或其他资源
-config/       # 博客配置
+src/content/blog/     # 博客文章，使用 Markdown 编写
+src/pages/            # 页面入口：首页、文章详情页
+src/layouts/          # 页面布局
+src/styles/           # 全局样式
+public/               # 静态资源，例如 favicon、公开图片
+.github/workflows/    # GitHub Pages 自动部署配置
 ```
-
-如果实际目录不同，以当前项目结构为准。
 
 ## GitHub Pages 发布
 
-博客可以通过 GitHub Pages 托管。
+博客通过 GitHub Actions 自动部署到 GitHub Pages。
 
 基本流程：
 
 1. 本地完成文章编写和预览。
-2. 执行构建命令生成静态页面。
-3. 将项目推送到 GitHub 仓库。
-4. 在仓库设置中开启 GitHub Pages。
-5. 选择对应的发布分支或构建目录。
+2. 提交并推送到 GitHub 的 main 分支。
+3. GitHub Actions 自动构建并部署。
+
+首次配置：
+
+1. 在 GitHub 仓库设置中开启 Pages，来源选择 GitHub Actions。
+2. 在 `astro.config.mjs` 中将 `site` 和 `base` 替换为实际的 GitHub 用户名和仓库名。
 
 ## 发布前检查
 

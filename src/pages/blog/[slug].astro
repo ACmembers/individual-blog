@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post }
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+
+const formattedDate = new Intl.DateTimeFormat('zh-CN', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit'
+}).format(post.data.pubDate);
+---
+
+<BaseLayout title={`${post.data.title} - 个人博客`} description={post.data.description}>
+  <article>
+    <p><a href={import.meta.env.BASE_URL}>← 返回首页</a></p>
+    <h1 class="article-card__title">{post.data.title}</h1>
+    <p class="article-card__date">{formattedDate}</p>
+    <div class="article-card__tags">
+      {post.data.tags.map((tag) => <span class="tag-pill">{tag}</span>)}
+    </div>
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
