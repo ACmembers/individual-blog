@@ -64,17 +64,10 @@ export default defineConfig({
 			updateHead: process.env.NODE_ENV === "production",
 			updateBodyClass: false,
 			globalInstance: true,
-			// 滚动相关配置优化
-			resolveUrl: (url) => url,
-			animateHistoryBrowsing: false,
-			skipPopStateHandling: (event) => {
-				// 跳过锚点链接的处理，让浏览器原生处理
-				return (
-					event.state &&
-					event.state.url &&
-					event.state.url.includes("#")
-				);
-			},
+			// 文章页（PostLayout，极简阅读模式）与主布局结构完全不同——没有 navbar、
+			// 没有 sidebar、有全屏壁纸——所以必须让 swup 跳过这些跳转，回退到浏览器
+			// 原生整页刷新；否则 AJAX 替换 <main> 后页面外壳还是旧的。
+			ignore: (url) => /\/posts\//.test(url),
 		}),
 		icon(),
 		expressiveCode({
