@@ -1,0 +1,49 @@
+---
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { getSortedPosts } from "@utils/content-utils";
+import { siteConfig } from "../config";
+
+const base = import.meta.env.BASE_URL;
+const posts = await getSortedPosts();
+
+// Extract unique categories from posts
+const categorySet = new Map<string, number>();
+for (const post of posts) {
+  const cat = post.data.category || "未分类";
+  categorySet.set(cat, (categorySet.get(cat) || 0) + 1);
+}
+const categories = Array.from(categorySet.entries());
+---
+
+<MainGridLayout
+  title={siteConfig.title}
+  description={siteConfig.subtitle}
+>
+  <section class="category-grid py-4">
+    {categories.map(([cat, count]) => (
+      <a
+        class="category-card block p-6 rounded-xl bg-white/85 dark:bg-neutral-900/85 backdrop-blur-sm shadow-md hover:shadow-lg transition-all hover:-translate-y-1 border border-neutral-200/50 dark:border-neutral-700/50"
+        href={`${base}category/${encodeURIComponent(cat)}/`}
+      >
+        <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">{cat}</h2>
+        <p class="text-sm text-neutral-500 dark:text-neutral-400">{count} 篇文章</p>
+      </a>
+    ))}
+    {categories.length === 0 && (
+      <p class="text-neutral-400 dark:text-neutral-500 text-center py-12 col-span-full">暂无分类</p>
+    )}
+  </section>
+</MainGridLayout>
+
+<style>
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  @media (max-width: 640px) {
+    .category-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
