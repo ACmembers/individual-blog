@@ -15,6 +15,19 @@ const { title, description, lang = "zh-CN" } = Astro.props;
 const pageTitle = `${title} - ${siteConfig.title}`;
 const configHue = siteConfig.themeColor.hue;
 const base = import.meta.env.BASE_URL;
+
+// Prepend base to wallpaper image paths for correct URLs on GitHub Pages
+const wallpaperConfig = {
+  ...fullscreenWallpaperConfig,
+  src: {
+    desktop: fullscreenWallpaperConfig.src.desktop.map((p) =>
+      p.startsWith("/") ? base.slice(0, -1) + p : p
+    ),
+    mobile: fullscreenWallpaperConfig.src.mobile.map((p) =>
+      p.startsWith("/") ? base.slice(0, -1) + p : p
+    ),
+  },
+};
 ---
 
 <!doctype html>
@@ -28,13 +41,7 @@ const base = import.meta.env.BASE_URL;
     <style define:vars={{ configHue }}></style>
   </head>
   <body class="min-h-screen text-[var(--text)]">
-    <FullscreenWallpaper config={fullscreenWallpaperConfig} />
-	    <!-- Force wallpaper visible on post pages -->
-	    <script is:inline>
-	      localStorage.setItem("wallpaperMode", "fullscreen");
-	      var wp = document.querySelector("[data-fullscreen-wallpaper]");
-	      if (wp) wp.style.display = "";
-	    </script>
+    <FullscreenWallpaper config={wallpaperConfig} />
 
     <!-- Minimal top bar -->
     <header class="fixed top-0 left-0 right-0 z-50 px-4 py-3 flex items-center gap-3 bg-transparent">
@@ -62,3 +69,9 @@ const base = import.meta.env.BASE_URL;
     </main>
   </body>
 </html>
+
+<script is:inline>
+  // Always show fullscreen wallpaper on article pages
+  localStorage.setItem("wallpaperMode", "fullscreen");
+  document.querySelector("[data-fullscreen-wallpaper]")?.removeAttribute("style");
+</script>
