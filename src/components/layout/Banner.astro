@@ -642,6 +642,15 @@ const bannerFormats = getImageFormats();
 		</div>
 	)}
 
+		<!-- 下拉提示箭头（仅首页显示） -->
+		{showTextOverlay && (
+			<div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2 banner-scroll-hint">
+				<span class="text-white/70 text-sm">向下滚动</span>
+				<div class="scroll-arrow w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
+					<span class="scroll-arrow-dot block w-1.5 h-1.5 bg-white/80 rounded-full mt-2 animate-bounce"></span>
+				</div>
+			</div>
+		)}
 	<!-- 水波纹效果 -->
 	{showWave && (
 		<div

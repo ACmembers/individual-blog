@@ -4,8 +4,8 @@
  */
 
 // Banner 高度常量
-export const BANNER_HEIGHT = 35;
-export const BANNER_HEIGHT_EXTEND = 30;
+export const BANNER_HEIGHT = 100;
+export const BANNER_HEIGHT_EXTEND = 0;
 export const BANNER_HEIGHT_HOME = BANNER_HEIGHT + BANNER_HEIGHT_EXTEND;
 
 // 选择器配置
