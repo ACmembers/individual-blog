@@ -6,13 +6,16 @@ import { siteConfig } from "../config";
 const base = import.meta.env.BASE_URL;
 const posts = await getSortedPosts();
 
-// Extract unique categories from posts
-const categorySet = new Map<string, number>();
+const FIXED_CATEGORIES = ["408", "算法", "开发", "数学"] as const;
+
+// Count posts per category
+const postCounts: Record<string, number> = {};
+for (const c of FIXED_CATEGORIES) postCounts[c] = 0;
 for (const post of posts) {
-  const cat = post.data.category || "未分类";
-  categorySet.set(cat, (categorySet.get(cat) || 0) + 1);
+  const cat = post.data.category || "";
+  if (cat in postCounts) postCounts[cat]++;
 }
-const categories = Array.from(categorySet.entries());
+const categories = FIXED_CATEGORIES.map((c) => [c, postCounts[c]] as const);
 ---
 
 <MainGridLayout
