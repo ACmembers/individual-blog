@@ -262,15 +262,15 @@ if (siteConfig.font) {
 	@layer components {
 		@media (min-width: 1280px) {
 			.enable-banner.lg\:is-home #banner-wrapper {
-				height: var(--banner-height-home);
-				transform: translateY(var(--banner-height-extend));
+				height: 100vh;
+				transform: translateY(0);
 			}
 			.enable-banner #banner-wrapper {
 				height: var(--banner-height-home);
 			}
 
 			.enable-banner.lg\:is-home #banner {
-				height: var(--banner-height-home);
+				height: 100vh;
 				transform: translateY(0);
 			}
 			.enable-banner #banner {
@@ -278,7 +278,7 @@ if (siteConfig.font) {
 				transform: translateY(var(--bannerOffset));
 			}
 			.enable-banner.lg\:is-home #main-grid {
-				transform: translateY(var(--banner-height-extend));
+				transform: translateY(100vh);
 			}
 			.enable-banner #top-row {
 				height: calc(var(--banner-height-home) - 4.5rem);
