@@ -1,0 +1,310 @@
+---
+import type { MarkdownHeading } from "astro";
+import { siteConfig, profileConfig, navBarConfig } from "@/config";
+import { url } from "@/utils/url-utils";
+import { getSortedPosts } from "@/utils/content-utils";
+
+import "../styles/butterfly.css";
+import "../styles/animation-enhancements.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  headings?: MarkdownHeading[];
+  isHome?: boolean;
+}
+
+const { title, description, headings, isHome = false } = Astro.props;
+
+// Get posts for sidebar
+const posts = await getSortedPosts();
+const recentPosts = posts.slice(0, 5);
+
+// Count posts
+const totalPosts = posts.length;
+
+// Calculate total word count
+const totalWords = posts.reduce((sum, p) => {
+  const body = p.body || "";
+  // Count Chinese characters + English words
+  const cnChars = (body.match(/[一-鿿㐀-䶿]/g) || []).length;
+  const enWords = body.replace(/[一-鿿㐀-䶿]/g, " ")
+    .split(/[\s,.;:!?()]+/).filter(Boolean).length;
+  return sum + cnChars + enWords;
+}, 0);
+const formattedWordCount = totalWords > 10000
+  ? (totalWords / 10000).toFixed(1) + "w"
+  : totalWords > 1000
+    ? (totalWords / 1000).toFixed(1) + "k"
+    : totalWords.toString();
+
+// Gather all tags
+const allTags = [...new Set(posts.flatMap(p => p.data.tags || []))].sort();
+
+// Gather all categories
+const allCategories = [...new Set(posts.map(p => p.data.category).filter(Boolean))];
+
+const pageTitle = title
+  ? `${title} - ${siteConfig.title}`
+  : `${siteConfig.title} - ${siteConfig.subtitle || ""}`;
+
+const bannerUrl = typeof siteConfig.banner.src === "string"
+  ? siteConfig.banner.src
+  : (Array.isArray(siteConfig.banner.src) ? siteConfig.banner.src[0] : "");
+---
+
+<!doctype html>
+<html lang="zh-CN" class="butterfly">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{pageTitle}</title>
+  <meta name="description" content={description || siteConfig.subtitle} />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    html.butterfly { scroll-behavior: smooth; }
+  </style>
+</head>
+<body>
+  <div id="body-wrap">
+    <!-- Page Header -->
+    <header
+      id="page-header"
+      class:list={["full_page", { "not-home-page": !isHome }]}
+      style={bannerUrl ? `background-image: url(${bannerUrl}); background-position: center 25% !important;` : ""}
+    >
+      <div id="site-info">
+        <h1 id="site-title">{isHome ? siteConfig.subtitle || siteConfig.title : title || siteConfig.title}</h1>
+        <div id="site-subtitle">
+          <span id="subtitle">{isHome ? siteConfig.title : ""}</span>
+        </div>
+      </div>
+      {isHome && (
+        <div id="scroll-down">
+          <i class="fas fa-angle-down scroll-down-effects"></i>
+        </div>
+      )}
+
+      <!-- Navigation -->
+      <nav id="nav" class="show">
+        <span id="blog-info">
+          <a href={url("/")}>
+            <span class="site-name">{siteConfig.navbarTitle?.text || siteConfig.title}</span>
+          </a>
+        </span>
+        <div id="menus">
+          <div id="search-button">
+            <a class="site-page social-icon search" href={url("/")}>
+              <i class="fas fa-search fa-fw"></i>
+            </a>
+          </div>
+          <div id="toggle-menu">
+            <a class="site-page"><i class="fas fa-bars fa-fw"></i></a>
+          </div>
+          <div class="menus_items">
+            <div class="menus_item">
+              <a class="site-page" href={url("/")}>
+                <i class="fas fa-home fa-fw"></i> 首页
+              </a>
+            </div>
+            <div class="menus_item">
+              <a class="site-page" href={url("/archive/")}>
+                <i class="fas fa-archive fa-fw"></i> 归档
+              </a>
+            </div>
+            {allCategories.map(cat => (
+              <div class="menus_item">
+                <a class="site-page" href={url(`/category/${encodeURIComponent(cat)}/`)}>
+                  <i class="fas fa-inbox fa-fw"></i> {cat}
+                </a>
+              </div>
+            ))}
+            <div class="menus_item">
+              <a class="site-page" href={url("/about/")}>
+                <i class="fas fa-user fa-fw"></i> 关于
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="layout" id="content-inner">
+      <div id="swup-container">
+        <slot />
+      </div>
+
+      <!-- Sidebar -->
+      <aside id="aside-content">
+        <!-- Author card -->
+        <div class="card-widget card-info">
+          <div class="is-center">
+            <div class="avatar-img">
+              <img src={profileConfig.avatar || "/avatar.png"} alt="avatar" />
+            </div>
+            <div class="author-info__name">{profileConfig.name}</div>
+            <div class="author-info__description">{profileConfig.bio}</div>
+          </div>
+          <div class="card-info-data site-data is-center">
+            <a href={url("/archive/")}>
+              <div class="headline">文章</div>
+              <div class="length-num">{totalPosts}</div>
+            </a>
+            <a href={url("/")}>
+              <div class="headline">分类</div>
+              <div class="length-num">{allCategories.length}</div>
+            </a>
+            <a href={url("/")}>
+              <div class="headline">标签</div>
+              <div class="length-num">{allTags.length}</div>
+            </a>
+          </div>
+          <div class="card-info-social-icons is-center">
+            {profileConfig.links?.map(link => (
+              <a class="social-icon" href={link.url} target="_blank" rel="noopener">
+                <i class={link.icon || "fas fa-link"}></i>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <!-- Recent Posts -->
+        <div class="card-widget">
+          <div class="item-headline">
+            <i class="fas fa-clock"></i><span>最新文章</span>
+          </div>
+          <div class="aside-list">
+            {recentPosts.map(post => (
+              <div class="aside-list-item">
+                {post.data.image && (
+                  <div class="thumbnail">
+                    <img src={post.data.image} alt="" loading="lazy" />
+                  </div>
+                )}
+                <div class="content">
+                  <a class="title" href={url(`/posts/${post.id}/`)}>{post.data.title}</a>
+                  <time datetime={post.data.published.toISOString()}>
+                    {post.data.published.toLocaleDateString("zh-CN")}
+                  </time>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <!-- Categories -->
+        {allCategories.length > 0 && (
+          <div class="card-widget">
+            <div class="item-headline">
+              <i class="fas fa-inbox"></i><span>分类</span>
+            </div>
+            <ul class="card-category-list">
+              {allCategories.map(cat => (
+                <li class="card-category-list-item">
+                  <a href={url(`/category/${encodeURIComponent(cat)}/`)}>
+                    <span class="card-category-list-name">{cat}</span>
+                    <span class="card-category-list-count">{posts.filter(p => p.data.category === cat).length}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <!-- Tags -->
+        {allTags.length > 0 && (
+          <div class="card-widget">
+            <div class="item-headline">
+              <i class="fas fa-tags"></i><span>标签</span>
+            </div>
+            <div class="card-tag-cloud">
+              {allTags.map(tag => (
+                <a href={url(`/tag/${encodeURIComponent(tag)}/`)} style={`font-size: ${Math.random() * 0.5 + 0.8}em`}>
+                  {tag}
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <!-- Web info -->
+        <div class="card-widget">
+          <div class="item-headline">
+            <i class="fas fa-info-circle"></i><span>网站信息</span>
+          </div>
+          <div class="webinfo">
+            <div class="webinfo-item">
+              <div>文章数量</div>
+              <div>{totalPosts}</div>
+            </div>
+            <div class="webinfo-item">
+              <div>总字数</div>
+              <div>{formattedWordCount}</div>
+            </div>
+            <div class="webinfo-item">
+              <div>建站天数</div>
+              <div id="site-runtime">--</div>
+            </div>
+            <div class="webinfo-item">
+              <div>最后更新</div>
+              <div>{posts.length > 0 ? posts[0].data.published.toLocaleDateString("zh-CN") : "--"}</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer">
+      <div id="footer-wrap">
+        <div class="copyright">©{new Date().getFullYear()} By {profileConfig.name}</div>
+        <div class="framework-info">
+          <span>Powered by</span>
+          <a target="_blank" href="https://astro.build">Astro</a>
+          <span class="footer-separator">|</span>
+          <span>Theme</span>
+          <a target="_blank" href="https://github.com/wehaox/Typecho-Butterfly">Butterfly</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Navbar scroll effect
+    function initNavScroll() {
+      const nav = document.getElementById('nav');
+      if (!nav) return;
+      let ticking = false;
+      function update() {
+        if (window.scrollY > 50) {
+          nav.classList.add('fixed');
+        } else {
+          nav.classList.remove('fixed');
+        }
+        ticking = false;
+      }
+      window.addEventListener('scroll', () => {
+        if (!ticking) { requestAnimationFrame(update); ticking = true; }
+      }, { passive: true });
+      update();
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initNavScroll);
+    } else {
+      initNavScroll();
+    }
+
+    // Site runtime counter
+    function updateRuntime() {
+      const el = document.getElementById('site-runtime');
+      if (!el) return;
+      const start = new Date('2026-01-01');
+      const now = new Date();
+      const days = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+      el.textContent = days + ' 天';
+    }
+    updateRuntime();
+  </script>
+</body>
+</html>

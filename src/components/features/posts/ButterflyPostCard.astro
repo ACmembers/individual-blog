@@ -1,0 +1,59 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getPostUrl } from "@/utils/url-utils";
+
+interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+const { post } = Astro.props;
+const { title, published, tags, category, image, description } = post.data;
+const url = getPostUrl(post);
+const hasCover = !!image;
+---
+
+<div class="recent-post-item">
+  {hasCover && (
+    <wehao class="post_cover">
+      <a href={url}>
+        <img
+          class="post-bg"
+          src={image}
+          alt={title}
+          loading="lazy"
+          onerror="this.onerror=null;this.src='/404.jpg'"
+        />
+      </a>
+    </wehao>
+  )}
+  <div class="recent-post-info">
+    <a class="article-title" href={url}>{title}</a>
+    <div class="article-meta-wrap">
+      <span class="post-meta-date">
+        <i class="far fa-calendar-alt"></i>
+        <span class="article-meta-label">发表于</span>
+        <span datetime={published.toISOString().substring(0, 10)}>
+          {published.toISOString().substring(0, 10)}
+        </span>
+      </span>
+      {category && (
+        <span class="article-meta">
+          <span class="article-meta-separator">|</span>
+          <i class="fas fa-inbox"></i>
+          {category}
+        </span>
+      )}
+      {tags && tags.length > 0 && (
+        <span class="article-meta">
+          <span class="article-meta-separator">|</span>
+          <i class="fas fa-tags"></i>
+          {tags.slice(0, 3).join(" / ")}
+        </span>
+      )}
+    </div>
+    <div class="content">
+      {description || "暂无摘要..."}
+      <br /><a href={url} title={title}>阅读全文...</a>
+    </div>
+  </div>
+</div>

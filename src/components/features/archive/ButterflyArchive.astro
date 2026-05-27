@@ -1,0 +1,182 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getPostUrl } from "@/utils/url-utils";
+import { getSortedPosts } from "@/utils/content-utils";
+
+interface GroupedPosts {
+  year: number;
+  posts: CollectionEntry<"blog">[];
+}
+
+const posts = await getSortedPosts();
+
+// Group posts by year
+const grouped: GroupedPosts[] = [];
+const yearMap = new Map<number, CollectionEntry<"blog">[]>();
+
+for (const post of posts) {
+  const year = post.data.published.getFullYear();
+  if (!yearMap.has(year)) yearMap.set(year, []);
+  yearMap.get(year)!.push(post);
+}
+
+for (const [year, yearPosts] of yearMap) {
+  grouped.push({ year, posts: yearPosts });
+}
+grouped.sort((a, b) => b.year - a.year);
+---
+
+<div class="article-sort">
+  {grouped.map(group => (
+    <>
+      <div class="article-sort-title">{group.year}</div>
+      {group.posts.map(post => {
+        const url = getPostUrl(post);
+        const date = post.data.published.toISOString().substring(0, 10);
+        return (
+          <div class="article-sort-item">
+            {post.data.image && (
+              <a class="article-sort-item-img" href={url}>
+                <img src={post.data.image} alt="" loading="lazy" />
+              </a>
+            )}
+            <div class="article-sort-item-info">
+              <a class="article-sort-item-title" href={url}>
+                {post.data.title}
+              </a>
+              <div class="article-sort-item-time">
+                <i class="far fa-calendar-alt"></i>
+                <time>{date}</time>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </>
+  ))}
+</div>
+
+<style>
+  .article-sort {
+    margin-left: 10px;
+    padding-left: 20px;
+    border-left: 2px solid #aadafa;
+  }
+
+  .article-sort-title {
+    position: relative;
+    margin-left: 10px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    font-size: 1.72em;
+    color: var(--font-color, #4c4948);
+  }
+
+  .article-sort-title::before {
+    position: absolute;
+    top: calc((100% - 36px) / 2);
+    left: -9px;
+    z-index: 1;
+    width: 10px;
+    height: 10px;
+    border: 5px solid #49b1f5;
+    border-radius: 10px;
+    background: var(--card-bg, #fff);
+    content: '';
+    line-height: 10px;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .article-sort-title:hover::before {
+    border-color: #ff7242;
+  }
+
+  .article-sort-title::after {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 0;
+    width: 2px;
+    height: 1.5em;
+    background: #aadafa;
+    content: '';
+  }
+
+  .article-sort-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin: 0 0 20px 10px;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .article-sort-item::before {
+    position: absolute;
+    left: calc(-20px - 17px);
+    width: 6px;
+    height: 6px;
+    border: 3px solid #49b1f5;
+    border-radius: 6px;
+    background: var(--card-bg, #fff);
+    content: '';
+    transition: all 0.2s ease-in-out;
+  }
+
+  .article-sort-item:hover::before {
+    border-color: #ff7242;
+  }
+
+  .article-sort-item-img {
+    overflow: hidden;
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    border-radius: 4px;
+  }
+
+  .article-sort-item-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.6s;
+  }
+
+  .article-sort-item-img:hover img {
+    transform: scale(1.1);
+  }
+
+  .article-sort-item-info {
+    flex: 1;
+    padding: 0 16px;
+  }
+
+  .article-sort-item-title {
+    color: var(--font-color, #4c4948);
+    font-size: 1.1em;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    transition: all 0.3s;
+    text-decoration: none;
+  }
+
+  .article-sort-item-title:hover {
+    color: #49b1f5;
+    transform: translateX(10px);
+  }
+
+  .article-sort-item-time {
+    color: #858585;
+    font-size: 95%;
+    margin-top: 4px;
+  }
+
+  .article-sort-item-time i {
+    margin-right: 4px;
+  }
+
+  .article-sort-item-time time {
+    cursor: default;
+  }
+</style>

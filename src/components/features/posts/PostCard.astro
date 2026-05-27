@@ -31,7 +31,6 @@ const {
 
 const url = getPostUrl(entry);
 const hasCover = image !== undefined && image !== null && image !== "";
-const coverWidth = "28%";
 
 const { remarkPluginFrontmatter } = await render(entry);
 const homeContent = getPostHomeContent(
@@ -40,157 +39,106 @@ const homeContent = getPostHomeContent(
 );
 ---
 
+<!-- Butterfly 风格文章卡片：封面图 + 内容左右排列，hover 放大效果 -->
 <div
 	class:list={[
-		"card-base flex flex-col-reverse md:flex-col w-full rounded-[var(--radius-large)] overflow-hidden relative",
+		"recent-post-item card-base flex flex-row w-full overflow-hidden relative",
 		className,
 	]}
 	style={style}
 >
-	<div
-		class:list={[
-			"pl-6 md:pl-9 pr-6 md:pr-2 pt-6 md:pt-7 pb-6 relative",
-			{
-				"w-full md:w-[calc(100%_-_3.25rem_-_0.75rem)]": !hasCover,
-				"w-full md:w-[calc(100%_-_var(--coverWidth)_-_0.75rem)]":
-					hasCover,
-			},
-		]}
-	>
-		<a
-			href={url}
-			class="transition group w-full block font-bold mb-3 text-3xl text-90
-        hover:text-[var(--primary)] dark:hover:text-[var(--primary)]
-        active:text-[var(--title-active)] dark:active:text-[var(--title-active)]
-        before:w-1 before:h-5 before:rounded-md before:bg-[var(--primary)]
-        before:absolute
-        before:top-[2.1875rem] before:left-[1.125rem] before:hidden md:before:block"
-		>
-			{
-				pinned && (
-					<Icon
-						name="mdi:pin"
-						class="inline text-[var(--primary)] text-2xl mr-2 -translate-y-0.5"
-					/>
-				)
-			}
-			{title}
-			{
-				encrypted && password && (
-					<Icon
-						name="material-symbols:lock-outline"
-						class="inline text-2xl align-middle -translate-y-px ml-2"
-					/>
-				)
-			}
-			<Icon
-				class="inline text-[2rem] text-[var(--primary)] md:hidden translate-y-0.5 absolute"
-				name="material-symbols:chevron-right-rounded"
-			/>
-			<Icon
-				class="text-[var(--primary)] text-[2rem] transition hidden md:inline absolute translate-y-0.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0"
-				name="material-symbols:chevron-right-rounded"
-			/>
-		</a>
-
-		<PostMetadata
-			published={published}
-			updated={updated}
-			tags={tags}
-			category={category || ""}
-			hideTagsForMobile={true}
-			hideUpdateDate={true}
-			className="mb-4"
-			showOnlyBasicMeta={true}
-			words={remarkPluginFrontmatter.words}
-			showWordCount={true}
-		/>
-
-		<div
-			class:list={[
-				"transition text-75 mb-3.5 pr-4",
-				{ "line-clamp-2 md:line-clamp-1": !description },
-			]}
-		>
-			{homeContent}
-		</div>
-
-		<div class="flex flex-wrap gap-2 mt-2">
-			{
-				tags && tags.length > 0 ? (
-					tags.map((tag) => (
-						<a
-							href={getTagUrl(tag)}
-							class:list={[
-								siteConfig.tagStyle?.useNewStyle
-									? "link-lg transition text-50 text-xs font-medium px-2 py-1 rounded-lg hover:text-[var(--primary)] dark:hover:text-[var(--primary)] active:text-[var(--primary)] dark:active:text-[var(--primary)] group/tag whitespace-nowrap"
-									: "btn-regular h-6 text-xs px-2 rounded-lg",
-							]}
-							aria-label={`View all posts tagged with ${tag.trim()}`}
-						>
-							<span class="transition-transform group-hover/tag:translate-x-0.5">
-								# {tag.trim()}
-							</span>
-						</a>
-					))
-				) : (
-					<span class="text-xs text-50">{i18n(I18nKey.noTags)}</span>
-				)
-			}
-		</div>
-	</div>
-
 	{
 		hasCover && (
 			<a
 				href={url}
 				aria-label={title}
-				class:list={[
-					"group",
-					"max-h-[20vh] md:max-h-none mx-4 mt-4 -mb-2 md:mb-0 md:mx-0 md:mt-0",
-					"md:w-[var(--coverWidth)] relative md:absolute md:top-3 md:bottom-3 md:right-3 rounded-xl overflow-hidden active:scale-95",
-				]}
+				class="post_cover shrink-0 overflow-hidden w-[44%] max-md:w-[35%]"
 			>
-				<div class="absolute pointer-events-none z-10 w-full h-full group-hover:bg-black/30 group-active:bg-black/50 transition" />
-				<div class="absolute pointer-events-none z-20 w-full h-full flex items-center justify-center ">
-					<Icon
-						name="material-symbols:chevron-right-rounded"
-						class="transition opacity-0 group-hover:opacity-100 scale-50 group-hover:scale-100 text-white text-5xl"
-					/>
-				</div>
 				<Image
 					src={image}
 					basePath={getFileDirFromPath(entry.filePath || "")}
-					alt="Cover Image of the Post"
-					class="w-full h-full"
-					widths={[200, 400, 800]}
-					sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+					alt={title}
+					class="post-bg w-full h-full object-cover transition-transform duration-600 hover:scale-110"
+					widths={[400, 800, 1200]}
+					sizes="(max-width: 768px) 50vw, 44vw"
 				/>
 			</a>
 		)
 	}
 
-	{
-		!hasCover && (
-			<a
-				href={url}
-				aria-label={title}
-				class="!hidden md:!flex btn-regular w-[3.25rem]
-         absolute right-3 top-3 bottom-3 rounded-xl bg-[var(--enter-btn-bg)]
-         hover:bg-[var(--enter-btn-bg-hover)] active:bg-[var(--enter-btn-bg-active)] active:scale-95
-        "
-			>
-				<Icon
-					name="material-symbols:chevron-right-rounded"
-					class="transition text-[var(--primary)] text-4xl mx-auto"
-				/>
-			</a>
-		)
-	}
-</div>
-<div
-	class="transition border-t-[1px] border-dashed mx-6 border-black/10 dark:border-white/[0.15] last:border-t-0 md:hidden"
->
+	<div class="recent-post-info flex-1 min-w-0 p-5 md:p-7 flex flex-col justify-center">
+		<a
+			href={url}
+			class="article-title block font-bold text-xl md:text-2xl text-[var(--deep-text)] hover:text-[#49b1f5] dark:hover:text-[#49b1f5] transition-colors duration-200 leading-snug mb-2"
+		>
+			{pinned && (
+				<Icon name="mdi:pin" class="inline text-[#ff7242] text-lg mr-1 -translate-y-0.5" />
+			)}
+			{title}
+			{encrypted && password && (
+				<Icon name="material-symbols:lock-outline" class="inline text-lg align-middle ml-1" />
+			)}
+		</a>
+
+		<div class="article-meta-wrap flex flex-wrap items-center gap-x-3 gap-y-1 text-[#858585] text-sm mb-3">
+			<span class="post-meta-date flex items-center gap-1">
+				<Icon name="fa7-regular:calendar-alt" class="text-xs" />
+				<span>{published.toISOString().substring(0, 10)}</span>
+			</span>
+			{category && (
+				<span class="article-meta flex items-center gap-1">
+					<span class="article-meta-separator">|</span>
+					<Icon name="fa7-solid:inbox" class="text-xs" />
+					<a href={getTagUrl(category)} class="hover:text-[#49b1f5] transition-colors">
+						{category}
+					</a>
+				</span>
+			)}
+		</div>
+
+		<div class="content text-[var(--content-meta)] text-sm leading-relaxed line-clamp-2">
+			{homeContent}
+		</div>
+
+		{
+			tags && tags.length > 0 && (
+				<div class="flex flex-wrap gap-1.5 mt-3">
+					{tags.map((tag) => (
+						<a
+							href={getTagUrl(tag)}
+							class="text-xs px-2 py-0.5 rounded-sm bg-[var(--btn-regular-bg)] text-[var(--btn-content)] hover:bg-[#49b1f5] hover:text-white transition-colors"
+						>
+							{tag.trim()}
+						</a>
+					))}
+				</div>
+			)
+		}
+	</div>
 </div>
 
-<style define:vars={{ coverWidth }}></style>
+<style>
+	/* Butterfly 风格封面 hover 缩放 */
+	.post_cover .post-bg {
+		transition: transform 0.6s ease-out;
+	}
+	.recent-post-item:hover .post_cover .post-bg {
+		transform: scale(1.1);
+	}
+
+	/* 文章标题行数限制 */
+	.article-title {
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	/* 摘要行数限制 */
+	.content {
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+</style>
