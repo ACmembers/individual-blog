@@ -1,0 +1,144 @@
+---
+import { render } from "astro:content";
+import { getPostHomeContent } from "@utils/post-card-content";
+import { Icon } from "astro-icon/components";
+
+import { getFileDirFromPath, getPostUrl, getTagUrl } from "@/utils/url-utils";
+
+import { siteConfig } from "../../../config";
+import I18nKey from "../../../i18n/i18nKey";
+import { i18n } from "../../../i18n/translation";
+import Image from "../../atoms/Image/Image.astro";
+import PostMetadata from "./PostMeta.astro";
+import type { PostCardProps } from "./types";
+
+const { entry, style }: PostCardProps = Astro.props as PostCardProps;
+const className = Astro.props.class;
+
+const {
+	title,
+	published,
+	updated,
+	tags,
+	category,
+	image,
+	description,
+	hideHomeContent,
+	pinned,
+	encrypted,
+	password,
+} = entry.data;
+
+const url = getPostUrl(entry);
+const hasCover = image !== undefined && image !== null && image !== "";
+
+const { remarkPluginFrontmatter } = await render(entry);
+const homeContent = getPostHomeContent(
+	{ description, hideHomeContent, password },
+	remarkPluginFrontmatter.excerpt,
+);
+---
+
+<!-- Butterfly 风格文章卡片：封面图 + 内容左右排列，hover 放大效果 -->
+<div
+	class:list={[
+		"recent-post-item card-base flex flex-row w-full overflow-hidden relative",
+		className,
+	]}
+	style={style}
+>
+	{
+		hasCover && (
+			<a
+				href={url}
+				aria-label={title}
+				class="post_cover shrink-0 overflow-hidden w-[44%] max-md:w-[35%]"
+			>
+				<Image
+					src={image}
+					basePath={getFileDirFromPath(entry.filePath || "")}
+					alt={title}
+					class="post-bg w-full h-full object-cover transition-transform duration-600 hover:scale-110"
+					widths={[400, 800, 1200]}
+					sizes="(max-width: 768px) 50vw, 44vw"
+				/>
+			</a>
+		)
+	}
+
+	<div class="recent-post-info flex-1 min-w-0 p-5 md:p-7 flex flex-col justify-center">
+		<a
+			href={url}
+			class="article-title block font-bold text-xl md:text-2xl text-[var(--deep-text)] hover:text-[#49b1f5] dark:hover:text-[#49b1f5] transition-colors duration-200 leading-snug mb-2"
+		>
+			{pinned && (
+				<Icon name="mdi:pin" class="inline text-[#ff7242] text-lg mr-1 -translate-y-0.5" />
+			)}
+			{title}
+			{encrypted && password && (
+				<Icon name="material-symbols:lock-outline" class="inline text-lg align-middle ml-1" />
+			)}
+		</a>
+
+		<div class="article-meta-wrap flex flex-wrap items-center gap-x-3 gap-y-1 text-[#858585] text-sm mb-3">
+			<span class="post-meta-date flex items-center gap-1">
+				<Icon name="fa7-regular:calendar-alt" class="text-xs" />
+				<span>{published.toISOString().substring(0, 10)}</span>
+			</span>
+			{category && (
+				<span class="article-meta flex items-center gap-1">
+					<span class="article-meta-separator">|</span>
+					<Icon name="fa7-solid:inbox" class="text-xs" />
+					<a href={getTagUrl(category)} class="hover:text-[#49b1f5] transition-colors">
+						{category}
+					</a>
+				</span>
+			)}
+		</div>
+
+		<div class="content text-[var(--content-meta)] text-sm leading-relaxed line-clamp-2">
+			{homeContent}
+		</div>
+
+		{
+			tags && tags.length > 0 && (
+				<div class="flex flex-wrap gap-1.5 mt-3">
+					{tags.map((tag) => (
+						<a
+							href={getTagUrl(tag)}
+							class="text-xs px-2 py-0.5 rounded-sm bg-[var(--btn-regular-bg)] text-[var(--btn-content)] hover:bg-[#49b1f5] hover:text-white transition-colors"
+						>
+							{tag.trim()}
+						</a>
+					))}
+				</div>
+			)
+		}
+	</div>
+</div>
+
+<style>
+	/* Butterfly 风格封面 hover 缩放 */
+	.post_cover .post-bg {
+		transition: transform 0.6s ease-out;
+	}
+	.recent-post-item:hover .post_cover .post-bg {
+		transform: scale(1.1);
+	}
+
+	/* 文章标题行数限制 */
+	.article-title {
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	/* 摘要行数限制 */
+	.content {
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+</style>

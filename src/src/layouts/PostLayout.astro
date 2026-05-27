@@ -1,0 +1,77 @@
+---
+import { Icon } from "astro-icon/components";
+import FullscreenWallpaper from "@components/misc/FullscreenWallpaper.astro";
+import { fullscreenWallpaperConfig, profileConfig, siteConfig } from "../config";
+import "../styles/main.css";
+import "../styles/expressive-code.css";
+
+interface Props {
+  title: string;
+  description?: string;
+  lang?: string;
+}
+
+const { title, description, lang = "zh-CN" } = Astro.props;
+const pageTitle = `${title} - ${siteConfig.title}`;
+const configHue = siteConfig.themeColor.hue;
+const base = import.meta.env.BASE_URL;
+
+// Prepend base to wallpaper image paths for correct URLs on GitHub Pages
+const wallpaperConfig = {
+  ...fullscreenWallpaperConfig,
+  src: {
+    desktop: fullscreenWallpaperConfig.src.desktop.map((p) =>
+      p.startsWith("/") ? base.slice(0, -1) + p : p
+    ),
+    mobile: fullscreenWallpaperConfig.src.mobile.map((p) =>
+      p.startsWith("/") ? base.slice(0, -1) + p : p
+    ),
+  },
+};
+---
+
+<!doctype html>
+<html lang={lang} class="bg-[var(--page-bg)]">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description || ""} />
+    <title>{pageTitle}</title>
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon/favicon.svg`} />
+    <style define:vars={{ configHue }}></style>
+  </head>
+  <body class="min-h-screen text-[var(--text)]">
+    <FullscreenWallpaper config={wallpaperConfig} />
+
+    <!-- Minimal top bar -->
+    <header class="fixed top-0 left-0 right-0 z-50 px-4 py-3 flex items-center gap-3 bg-transparent">
+      <a
+        href={base}
+        class="flex items-center gap-1.5 text-sm text-white/70 hover:text-white transition-colors bg-black/30 hover:bg-black/50 rounded-full px-4 py-2 backdrop-blur-sm"
+      >
+        <Icon name="material-symbols:arrow-back" class="text-lg" />
+        <span>返回首页</span>
+      </a>
+    </header>
+
+    <!-- Article content -->
+    <main class="relative z-10 min-h-screen flex justify-center">
+      <article class="w-full max-w-3xl px-4 md:px-8 pt-20 pb-16">
+        <div class="bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md rounded-2xl shadow-xl p-6 md:p-10">
+          <slot />
+        </div>
+
+        <!-- Minimal footer -->
+        <div class="text-center mt-8 text-xs text-white/50">
+          {profileConfig.name} · Powered by Mizuki
+        </div>
+      </article>
+    </main>
+  </body>
+</html>
+
+<script is:inline>
+  // Always show fullscreen wallpaper on article pages
+  localStorage.setItem("wallpaperMode", "fullscreen");
+  document.querySelector("[data-fullscreen-wallpaper]")?.removeAttribute("style");
+</script>

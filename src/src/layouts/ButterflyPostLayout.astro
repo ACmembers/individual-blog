@@ -1,0 +1,126 @@
+---
+import { siteConfig, profileConfig } from "@/config";
+import { url } from "@/utils/url-utils";
+import { getSortedPosts } from "@/utils/content-utils";
+import "../styles/butterfly.css";
+import "../styles/animation-enhancements.css";
+
+interface Props {
+  title: string;
+  description?: string;
+  date?: Date;
+  category?: string;
+  tags?: string[];
+  banner?: string;
+}
+
+const { title, description, date, category, tags, banner } = Astro.props;
+
+const posts = await getSortedPosts();
+const recentPosts = posts.slice(0, 5);
+const allTags = [...new Set(posts.flatMap(p => p.data.tags || []))].sort();
+const allCategories = [...new Set(posts.map(p => p.data.category).filter(Boolean))];
+const totalPosts = posts.length;
+
+const pageTitle = `${title} - ${siteConfig.title}`;
+const bannerUrl = banner || (typeof siteConfig.banner.src === "string" ? siteConfig.banner.src : "");
+---
+
+<!doctype html>
+<html lang="zh-CN" class="butterfly">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{pageTitle}</title>
+  <meta name="description" content={description || ""} />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+  <div id="body-wrap">
+    <!-- Post Header -->
+    <header
+      id="page-header"
+      class="post-bg"
+      style={bannerUrl ? `background-image: url(${bannerUrl}); background-position: center 25% !important;` : ""}
+    >
+      <nav id="nav" class="show">
+        <span id="blog-info">
+          <a href={url("/")}><span class="site-name">{siteConfig.title}</span></a>
+        </span>
+        <div id="menus">
+          <div id="search-button">
+            <a class="site-page" href={url("/")}>
+              <i class="fas fa-search fa-fw"></i>
+            </a>
+          </div>
+          <div class="menus_items">
+            <div class="menus_item">
+              <a class="site-page" href={url("/")}><i class="fas fa-home fa-fw"></i> 首页</a>
+            </div>
+            <div class="menus_item">
+              <a class="site-page" href={url("/archive/")}><i class="fas fa-archive fa-fw"></i> 归档</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <div id="post-info">
+        <h1 class="post-title">{title}</h1>
+        <div id="post-meta">
+          {date && <span><i class="far fa-calendar-alt"></i> {date.toISOString().substring(0, 10)}</span>}
+          {category && <span><i class="fas fa-inbox"></i> {category}</span>}
+        </div>
+      </div>
+    </header>
+
+    <main class="layout" id="content-inner">
+      <article class="post-content" id="article-container">
+        <slot />
+      </article>
+
+      <aside id="aside-content">
+        <div class="card-widget card-info">
+          <div class="is-center">
+            <div class="avatar-img">
+              <img src={profileConfig.avatar || "/avatar.png"} alt="avatar" loading="lazy" />
+            </div>
+            <div class="author-info__name">{profileConfig.name}</div>
+            <div class="author-info__description">{profileConfig.bio}</div>
+          </div>
+        </div>
+
+        <div class="card-widget">
+          <div class="item-headline"><i class="fas fa-clock"></i><span>最新文章</span></div>
+          <div class="aside-list">
+            {recentPosts.map(p => (
+              <div class="aside-list-item">
+                <div class="content">
+                  <a class="title" href={url(`/posts/${p.id}/`)}>{p.data.title}</a>
+                  <time>{p.data.published.toLocaleDateString("zh-CN")}</time>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer id="footer">
+      <div id="footer-wrap">
+        <div>©{new Date().getFullYear()} {profileConfig.name}</div>
+        <div>Powered by Astro | Theme Butterfly</div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    function initNav() {
+      const nav = document.getElementById('nav');
+      if (!nav) return;
+      window.addEventListener('scroll', () => {
+        nav.classList.toggle('fixed', window.scrollY > 50);
+      }, { passive: true });
+    }
+    document.addEventListener('DOMContentLoaded', initNav);
+  </script>
+</body>
+</html>
