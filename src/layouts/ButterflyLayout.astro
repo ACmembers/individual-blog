@@ -49,9 +49,15 @@ const pageTitle = title
   ? `${title} - ${siteConfig.title}`
   : `${siteConfig.title} - ${siteConfig.subtitle || ""}`;
 
-const bannerUrl = typeof siteConfig.banner.src === "string"
+const base = import.meta.env.BASE_URL;
+
+const rawBanner = typeof siteConfig.banner.src === "string"
   ? siteConfig.banner.src
   : (Array.isArray(siteConfig.banner.src) ? siteConfig.banner.src[0] : "");
+const bannerUrl = rawBanner ? base + rawBanner.replace(/^\//, '') : "";
+
+const rawAvatar = profileConfig.avatar || "";
+const avatarUrl = rawAvatar.startsWith("http") ? rawAvatar : base + rawAvatar.replace(/^\//, '');
 ---
 
 <!doctype html>
@@ -142,7 +148,7 @@ const bannerUrl = typeof siteConfig.banner.src === "string"
         <div class="card-widget card-info">
           <div class="is-center">
             <div class="avatar-img">
-              <img src={profileConfig.avatar || "/avatar.png"} alt="avatar" />
+              <img src={avatarUrl || base + "assets/images/avatar.jpg"} alt="avatar" />
             </div>
             <div class="author-info__name">{profileConfig.name}</div>
             <div class="author-info__description">{profileConfig.bio}</div>

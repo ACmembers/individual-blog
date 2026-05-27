@@ -23,7 +23,11 @@ const allCategories = [...new Set(posts.map(p => p.data.category).filter(Boolean
 const totalPosts = posts.length;
 
 const pageTitle = `${title} - ${siteConfig.title}`;
-const bannerUrl = banner || (typeof siteConfig.banner.src === "string" ? siteConfig.banner.src : "");
+const base = import.meta.env.BASE_URL;
+const rawBanner = banner || (typeof siteConfig.banner.src === "string" ? siteConfig.banner.src : "");
+const bannerUrl = rawBanner ? base + rawBanner.replace(/^\//, '') : "";
+const rawAvatar = profileConfig.avatar || "";
+const avatarUrl = rawAvatar.startsWith("http") ? rawAvatar : base + rawAvatar.replace(/^\//, '');
 ---
 
 <!doctype html>
